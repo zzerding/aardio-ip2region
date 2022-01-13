@@ -3,6 +3,9 @@ import console;
 import inet.ip2region;
 var ip2 = inet.ip2region();
 
+errIp = "12345";
+var region,err = ip2.search(errIp)
+assert(err,"应该返回错误的ip")
 timeDiff = function() {
     var t1 = time.tick();
     return function() {
