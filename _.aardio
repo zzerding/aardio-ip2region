@@ -2,7 +2,6 @@
 class inet.ip2region {
     ctor( dbFilePath ) {
         ip2regionEntry = ip2region_entry();
-        datablockEmtry = datablock_entry();
         ip2rObj        =..raw.buffer( ip2regionEntry );
         if ( !dbFilePath ) {
             dbFilePath =..io.exist( "~/lib/inet/ip2region/ip2region.db" );
@@ -23,8 +22,7 @@ class inet.ip2region {
     	if ( type( ip ) != type.string  or !..string.find(ip,"\d+\.\d+\.\d+\.\d+")) {
         	return null, "ip 错误";
     	};
-
-    	datablock = ..raw.buffer( datablockEmtry );
+		var datablock =datablock_entry();
     	var isState;
     	select( algorithm ) {
         	case 0 {
@@ -37,12 +35,10 @@ class inet.ip2region {
 				isState = _dll.ip2region_btree_search_string(ip2rObj, ip ,datablock);
 			};
 		};
-		result = ..raw.convert(datablock,datablockEmtry);
-		..raw.realloc(0,datablock);//释放动态指针
+		var result =  ..raw.str(datablock.region);
 		if(isState){
-			return result.region,null;
+			return result,null;
 		}else{
-			raw.realloc(0,datablock);
 			return null,"转换失败";
 		};
 	};
@@ -64,7 +60,7 @@ namespace inet.ip2region{
 
     datablock_entry = class {
         int city_id;
-        byte region[ 255 ];
+        byte region[255]  =..raw.buffer(255); 
     };
 
 };
