@@ -1,4 +1,6 @@
 //ip2region ip地理位置查询
+import inet.url;
+import wsock;
 class inet.ip2region {
     ctor( dbFilePath ) {
         ip2regionEntry = ip2region_entry();
@@ -42,6 +44,29 @@ class inet.ip2region {
 			return null,"转换失败";
 		};
 	};
+	getUrlRegion = function (url){
+		if(type(url) != type.string){
+			return null,"url is not string"; 
+		}
+		if(..string.find(url,ipReg)){
+			return this.search(url);
+		}
+		var uri = ..inet.url.split(url,0x0/*_URLIS_URL*/);
+		if(!uri){
+			return null,"url 格式错误" ++url; 
+		};
+		var ip;
+		var host = uri.host;
+		if(..string.find(host,"\d+\.\d+\.\d+\.\d+")){
+			ip = host;
+		}else{
+			ip = ..wsock.getIp(host);
+		}
+		if(!ip){
+			return  null,url++"没有解析出ip"; 
+		}
+		return this.search(ip);
+	}
 };
 namespace inet.ip2region{
     _dll            =..raw.loadDll( $"~/lib/inet/ip2region/ip2.dll",, "cdecl" );
@@ -62,12 +87,13 @@ namespace inet.ip2region{
         int city_id;
         byte region[255]  =..raw.buffer(255); 
     };
-
+	ipReg = "^\d+\.\d+\.\d+\.\d+$";
 };
 
 /**intellisense()
-inet.ip2region(dbFilePath) = ip地理位置查询 基于 https://github.com/lionsoul2014/ip2region aardio封装\n @1 数据库文件位置，可选参数，不支持内存地址
+inet.ip2region(.(dbFilePath) = ip地理位置查询 基于 https://github.com/lionsoul2014/ip2region aardio封装\n @1 数据库文件位置，可选参数，不支持内存地址
 inet.ip2region() =!ip2region.
+getUrlRegion(url) = 根据 url 或者ip地址 返回 ip 位置默认调用 search 的btree 模式
 !ip2region.destroy = gc
 !ip2region.search(ip,algorithm) = 查找ip定位\n @1 ip 字符 @2 查找模式 数字 默认为2\n 0 memory 整个数据库全部载入内存\n 1 binary 基于二分查找\n 2: b-tree 基于btree算法\n @resutl (位置字符串,error)
 end intellisense**/
